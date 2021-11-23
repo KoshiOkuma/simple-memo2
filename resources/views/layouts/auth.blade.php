@@ -93,7 +93,6 @@
                       </div>
                 </div>
                 <div class="col-md-6 p-0">
-                    右
                     @yield('content')
                 </div>
             </div>
