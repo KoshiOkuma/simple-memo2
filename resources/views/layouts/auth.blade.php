@@ -88,7 +88,10 @@
                     <div class="card">
                         <div class="card-header">中央カラム</div>
                         <div class="card-body">
-                          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            @foreach ($memos as $memo )
+                            <p class="card-text">{{ $memo['content'] }}</p>
+                            {{-- <a class="card-text d-block">{{ $memo['content'] }}</a> --}}
+                            @endforeach
                         </div>
                       </div>
                 </div>
