@@ -3,6 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Memo;
+use App\Models\Tag;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +28,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        view()->composer('*', function($view)
+        {
+            $memo_model = new Memo();
+
+            $memos = $memo_model->getMyMemo();
+
+            $tags = Tag::where('user_id', '=', Auth::id())
+            ->whereNull('deleted_at')
+            ->orderBy('id', 'desc')
+            ->get();
+
+            $view->with('memos', $memos)
+            ->with('tags', $tags);
+        });
     }
 }

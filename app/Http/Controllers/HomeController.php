@@ -29,11 +29,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $memos = Memo::select('memos.*')
-        ->where('user_id', '=', Auth::id())
-        ->whereNull('deleted_at')
-        ->orderBy('updated_at', 'desc')
-        ->get();
+        // $memos = Memo::select('memos.*')
+        // ->where('user_id', '=', Auth::id())
+        // ->whereNull('deleted_at')
+        // ->orderBy('updated_at', 'desc')
+        // ->get();
 
         $tags = Tag::where('user_id', '=', Auth::id())
         ->whereNull('deleted_at')
@@ -42,11 +42,15 @@ class HomeController extends Controller
 
         // dd($tags);
 
-        return view('create', compact('memos', 'tags'));
+        return view('create', compact('tags'));
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'content' => 'required'
+        ]);
+
         $posts = $request->all();
         // dd($posts);
 
@@ -90,26 +94,78 @@ class HomeController extends Controller
 
     public function edit($id)
     {
-        $memos = Memo::select('memos.*')
-        ->where('user_id', '=', Auth::id())
-        ->whereNull('deleted_at')
-        ->orderBy('updated_at', 'desc')
+        $edit_memo = Memo::select('memos.*', 'tags.id as tag_id')
+        ->leftJoin('memo_tags','memo_tags.memo_id', '=', 'memos.id')
+        ->leftJoin('tags', 'memo_tags.tag_id', '=', 'tags.id')
+        ->where('memos.user_id', '=', Auth::id())
+        ->where('memos.id', '=', $id)
+        ->whereNull('memos.deleted_at')
         ->get();
 
-        $edit_memo = Memo::findOrFail($id);
+        $include_tags = [];
+        foreach($edit_memo as $memo){
+            array_push($include_tags, $memo['tag_id']);
+        }
 
-        return view('edit', compact('memos', 'edit_memo'));
+        $tags = Tag::where('user_id', '=', Auth::id())
+        ->whereNull('deleted_at')
+        ->orderBy('id', 'desc')
+        ->get();
+
+        // dd($include_tags);
+
+        return view('edit', compact('edit_memo', 'include_tags','tags'));
     }
 
     public function update(Request $request)
     {
+        $request->validate([
+            'content' => 'required'
+        ]);
+
         $posts = $request->all();
         // dd($posts);
 
-        Memo::where('id', $posts['memo_id'])
-        ->update([
-            'content' => $posts['content'],
-            ]);
+        DB::transaction(function () use($posts)
+        {
+            Memo::where('id', $posts['memo_id'])
+            ->update([
+                'content' => $posts['content'],
+                ]);
+                // メモとタグの紐付けを削除
+            MemoTag::where('memo_id', '=', $posts['memo_id'])
+            ->delete();
+                // 再度紐付け
+            if(array_key_exists('tags', $posts))
+            {
+                foreach($posts['tags'] as $tag)
+                {
+                    MemoTag::insert([
+                        'memo_id' => $posts['memo_id'],
+                        'tag_id' => $tag
+                    ]);
+                }
+            }
+
+            $tag_exists = Tag::where('user_id', '=', Auth::id())
+            ->where('name', '=', $posts['new_tag'])
+            ->exists();
+
+            if(!empty($posts['new_tag']) && !$tag_exists )
+            {
+                $tag_id = Tag::insertGetId([
+                    'user_id' => Auth::id(),
+                    'name' => $posts['new_tag']
+                ]);
+
+                MemoTag::insert([
+                    'memo_id' => $posts['memo_id'],
+                    'tag_id' => $tag_id
+                ]);
+            }
+
+        });
+
 
         return redirect()->route('home');
     }
