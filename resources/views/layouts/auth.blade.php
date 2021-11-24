@@ -89,8 +89,8 @@
                         <div class="card-header">中央カラム</div>
                         <div class="card-body">
                             @foreach ($memos as $memo )
-                            <p class="card-text">{{ $memo['content'] }}</p>
-                            {{-- <a class="card-text d-block">{{ $memo['content'] }}</a> --}}
+                            {{-- <p class="card-text">{{ $memo['content'] }}</p> --}}
+                            <a href="/edit/{{$memo['id']}}" class="card-text d-block">{{ $memo['content'] }}</a>
                             @endforeach
                         </div>
                       </div>
