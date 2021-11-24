@@ -7,7 +7,7 @@
         <form action="{{ route('destroy')}}" method="post" id="delete-form">
             @csrf
             <input type="hidden" name="memo_id" value="{{ $edit_memo[0]['id'] }}">
-            <button type="submit" onclick="deleteHandle(event)">削除</button>
+            <i class="fas fa-trash" onclick="deleteHandle(event)"></i>
         </form>
     </div>
     <form class="card-body" action="{{ route('update') }}" method="post">
@@ -38,7 +38,7 @@
         {
             document.getElementById('delete-form').submit();
         } else {
-            alert('キャンセルしました');
+            // alert('キャンセルしました');
         }
       }
   </script>
