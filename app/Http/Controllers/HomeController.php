@@ -96,9 +96,27 @@ class HomeController extends Controller
         ->orderBy('updated_at', 'desc')
         ->get();
 
-        $edit_memo = Memo::findOrFail($id);
+        $edit_memo = Memo::select('memos.*', 'tags.id as tag_id')
+        ->leftJoin('memo_tags','memo_tags.memo_id', '=', 'memos.id')
+        ->leftJoin('tags', 'memo_tags.tag_id', '=', 'tags.id')
+        ->where('memos.user_id', '=', Auth::id())
+        ->where('memos.id', '=', $id)
+        ->whereNull('memos.deleted_at')
+        ->get();
 
-        return view('edit', compact('memos', 'edit_memo'));
+        $include_tags = [];
+        foreach($edit_memo as $memo){
+            array_push($include_tags, $memo['tag_id']);
+        }
+
+        $tags = Tag::where('user_id', '=', Auth::id())
+        ->whereNull('deleted_at')
+        ->orderBy('id', 'desc')
+        ->get();
+
+        // dd($include_tags);
+
+        return view('edit', compact('memos', 'edit_memo', 'include_tags','tags'));
     }
 
     public function update(Request $request)
