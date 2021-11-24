@@ -30,27 +30,9 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('*', function($view)
         {
-            $query_tag = \Request::query('tag');
-            // dd($query_tag);
+            $memo_model = new Memo();
 
-            if(!empty($query_tag))
-            {
-                $memos = Memo::select('memos.*')
-                ->leftJoin('memo_tags', 'memo_tags.memo_id', '=', 'memos.id')
-                ->where('memo_tags.tag_id', '=', $query_tag)
-                ->where('user_id', '=', Auth::id())
-                ->whereNull('deleted_at')
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            } else {
-                $memos = Memo::select('memos.*')
-                ->where('user_id', '=', Auth::id())
-                ->whereNull('deleted_at')
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            }
+            $memos = $memo_model->getMyMemo();
 
             $tags = Tag::where('user_id', '=', Auth::id())
             ->whereNull('deleted_at')
