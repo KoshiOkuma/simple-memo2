@@ -136,12 +136,15 @@ class HomeController extends Controller
             MemoTag::where('memo_id', '=', $posts['memo_id'])
             ->delete();
                 // 再度紐付け
-            foreach($posts['tags'] as $tag)
+            if(array_key_exists('tags', $posts))
             {
-                MemoTag::insert([
-                    'memo_id' => $posts['memo_id'],
-                    'tag_id' => $tag
-                ]);
+                foreach($posts['tags'] as $tag)
+                {
+                    MemoTag::insert([
+                        'memo_id' => $posts['memo_id'],
+                        'tag_id' => $tag
+                    ]);
+                }
             }
 
             $tag_exists = Tag::where('user_id', '=', Auth::id())
