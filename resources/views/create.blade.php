@@ -3,7 +3,7 @@
 @section('content')
 <div class="card">
     <div class="card-header">新規メモ作成</div>
-    <form class="card-body" action="{{ route('store') }}" method="post">
+    <form class="card-body my-card-body" action="{{ route('store') }}" method="post">
         @csrf
         <div class="form-group">
             <textarea class="form-control" name="content" rows="3" placeholder="ここに入力"></textarea>
@@ -13,7 +13,7 @@
           @enderror
           @foreach ($tags as $tag )
           <div class="form-check form-check-inline mb-3">
-              <input type="checkbox" name="tags[]" id="{{$tag['id']}}" value="{{$tag['id']}}">
+              <input type="checkbox" name="tags[]" id="{{$tag['id']}}" value="{{$tag['id']}}" class="mr-2">
               <label for="{{$tag['id']}}">{{$tag['name']}}</label>
           </div>
           @endforeach

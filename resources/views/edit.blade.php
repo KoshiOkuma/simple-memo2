@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between">
         メモ編集
         <form action="{{ route('destroy')}}" method="post" id="delete-form">
             @csrf
             <input type="hidden" name="memo_id" value="{{ $edit_memo[0]['id'] }}">
-            <button type="submit" onclick="deleteHandle(event)">削除</button>
+            <i class="fas fa-trash mr-3" onclick="deleteHandle(event)"></i>
         </form>
     </div>
-    <form class="card-body" action="{{ route('update') }}" method="post">
+    <form class="card-body my-card-body" action="{{ route('update') }}" method="post">
         @csrf
         <input type="hidden" name="memo_id" value="{{ $edit_memo[0]['id'] }}">
         <div class="form-group">
@@ -38,7 +38,7 @@
         {
             document.getElementById('delete-form').submit();
         } else {
-            alert('キャンセルしました');
+            // alert('キャンセルしました');
         }
       }
   </script>
