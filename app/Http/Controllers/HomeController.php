@@ -124,10 +124,43 @@ class HomeController extends Controller
         $posts = $request->all();
         // dd($posts);
 
-        Memo::where('id', $posts['memo_id'])
-        ->update([
-            'content' => $posts['content'],
-            ]);
+        DB::transaction(function () use($posts)
+        {
+            Memo::where('id', $posts['memo_id'])
+            ->update([
+                'content' => $posts['content'],
+                ]);
+                // メモとタグの紐付けを削除
+            MemoTag::where('memo_id', '=', $posts['memo_id'])
+            ->delete();
+                // 再度紐付け
+            foreach($posts['tags'] as $tag)
+            {
+                MemoTag::insert([
+                    'memo_id' => $posts['memo_id'],
+                    'tag_id' => $tag
+                ]);
+            }
+
+            $tag_exists = Tag::where('user_id', '=', Auth::id())
+            ->where('name', '=', $posts['new_tag'])
+            ->exists();
+
+            if(!empty($posts['new_tag']) && !$tag_exists )
+            {
+                $tag_id = Tag::insertGetId([
+                    'user_id' => Auth::id(),
+                    'name' => $posts['new_tag']
+                ]);
+
+                MemoTag::insert([
+                    'memo_id' => $posts['memo_id'],
+                    'tag_id' => $tag_id
+                ]);
+            }
+
+        });
+
 
         return redirect()->route('home');
     }
