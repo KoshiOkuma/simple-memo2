@@ -47,6 +47,10 @@ class HomeController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'content' => 'required'
+        ]);
+
         $posts = $request->all();
         // dd($posts);
 
@@ -90,12 +94,6 @@ class HomeController extends Controller
 
     public function edit($id)
     {
-        // $memos = Memo::select('memos.*')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereNull('deleted_at')
-        // ->orderBy('updated_at', 'desc')
-        // ->get();
-
         $edit_memo = Memo::select('memos.*', 'tags.id as tag_id')
         ->leftJoin('memo_tags','memo_tags.memo_id', '=', 'memos.id')
         ->leftJoin('tags', 'memo_tags.tag_id', '=', 'tags.id')
@@ -121,6 +119,10 @@ class HomeController extends Controller
 
     public function update(Request $request)
     {
+        $request->validate([
+            'content' => 'required'
+        ]);
+
         $posts = $request->all();
         // dd($posts);
 
