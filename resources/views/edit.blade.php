@@ -4,10 +4,10 @@
 <div class="card">
     <div class="card-header">
         メモ編集
-        <form action="{{ route('destroy')}}" method="post">
+        <form action="{{ route('destroy')}}" method="post" id="delete-form">
             @csrf
             <input type="hidden" name="memo_id" value="{{ $edit_memo[0]['id'] }}">
-            <button type="submit">削除</button>
+            <button type="submit" onclick="deleteHandle(event)">削除</button>
         </form>
     </div>
     <form class="card-body" action="{{ route('update') }}" method="post">
@@ -29,4 +29,17 @@
           <button type="submit" class="btn btn-primary">更新</button>
         </form>
   </div>
+
+  <script>
+      function deleteHandle(event)
+      {
+          event.preventDefault();
+        if(window.confirm('本当に削除していいですか？'))
+        {
+            document.getElementById('delete-form').submit();
+        } else {
+            alert('キャンセルしました');
+        }
+      }
+  </script>
 @endsection
